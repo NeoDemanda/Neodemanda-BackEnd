@@ -40,6 +40,13 @@
 			<artifactId>spring-boot-starter-validation</artifactId>
 		</dependency>
 
+		<!-- Documentacao OpenAPI/Swagger UI (linha 3.x = Spring Boot 4.x) -->
+		<dependency>
+			<groupId>org.springdoc</groupId>
+			<artifactId>springdoc-openapi-starter-webmvc-ui</artifactId>
+			<version>3.1.1</version>
+		</dependency>
+
 		<!-- Hot reload em desenvolvimento -->
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
