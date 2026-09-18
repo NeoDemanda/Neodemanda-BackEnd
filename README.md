@@ -3,7 +3,7 @@
 Sistema de cálculo de demanda elétrica para múltiplas unidades consumidoras,
 desenvolvido para o Desafio Neoenergia Pernambuco.
 
-## Entrega 01
+## POO - Entrega 01
 
 * **Histórias de Usuário (BDD):** [Acessar documento de histórias](./USER_STORIES.md)
 * **Protótipo Lo-Fi (Figma):** [Acessar protótipo no Figma](https://www.figma.com/board/onKTrKXokheee44mOtn8tY/Semana-3?node-id=0-1&p=f&t=CaoYtOBM9zOhoPS2-0)
