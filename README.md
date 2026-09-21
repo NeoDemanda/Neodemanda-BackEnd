@@ -17,6 +17,61 @@ Este repositório contém a estrutura base do back-end, preparada para receber a
 funcionalidades de cálculo normativo. No momento expõe apenas um endpoint de
 health-check, usado para validar que a aplicação está operante.
 
+## POO - Entrega 02
+
+### Histórias Implementadas
+
+Nesta entrega, foram implementadas as funcionalidades do back-end para viabilizar o fluxo básico de cadastro e visualização de projetos elétricos, utilizando contratos REST documentados via OpenAPI/Swagger.
+
+#### [US02] Criar Projeto
+* **Como** projetista
+* **Quero** cadastrar um novo projeto informando cliente, tipo, potência e quantidade de unidades
+* **Para que** eu possa iniciar estruturadamente o processo de análise de uma nova demanda elétrica.
+
+**Critérios de Aceite (BDD):**
+* **Dado** que o projetista se encontra no dashboard ou cliente de requisições
+* **Quando** ele envia uma requisição `POST /projetos` com os dados obrigatórios preenchidos (`nomeProjeto`, `responsavelTecnico`, `creaResponsavel`, `quantidadeUnidadesConsumidoras`, `cargaInstaladaKva` e `tipoEdificacao`)
+* **Então** o sistema valida o corpo da requisição, cria o registro com status inicial `RASCUNHO` e retorna o código HTTP `201 Created` contendo o ID gerado.
+
+---
+
+#### [US01] Visualizar Dashboard (Listagem de Projetos)
+* **Como** projetista
+* **Quero** visualizar meus projetos e seus status em um painel/dashboard
+* **Para que** eu possa acompanhar rapidamente o andamento e o volume das demandas ativas.
+
+**Critérios de Aceite (BDD):**
+* **Dado** que existem projetos cadastrados na aplicação
+* **Quando** o usuário realiza uma requisição `GET /projetos`
+* **Então** o sistema retorna o código HTTP `200 OK` contendo a listagem atualizada de todos os projetos salvos e seus respectivos status[cite: 8].
+
+---
+
+### Issue / Bug Tracker
+
+O acompanhamento das tarefas e do ciclo de vida das histórias de usuário desta entrega foi gerenciado diretamente pelo GitHub Issues[cite: 17].
+
+![Issue Tracker](docs/Print_Issue.jpg)
+
+### Screencasts da Aplicação
+
+Os vídeos de demonstração e de detalhamento técnico foram disponibilizados no YouTube conforme as diretrizes da entrega[cite: 17]:
+
+1. **Uso do Sistema (Aplicação Spring Boot rodando via Swagger UI):**  
+   * Link: [Assistir no YouTube](https://youtu.be/xYEddJ1rLeY)
+
+2. **Explicação do Código Spring Boot e Decisões de Arquitetura:**  
+   * Link: [Assistir no YouTube](https://youtu.be/Q07nLVtD03o)
+
+---
+
+### Decisão Arquitetural: Persistência Temporária (H2 / Memória)
+
+Para a Entrega 02, optou-se pela utilização do banco H2 em memória e estruturas thread-safe[cite: 17]. Os principais fatores para essa decisão foram:
+* **Foco nos Contratos da API:** Priorizar a correta modelagem dos DTOs, validações com Bean Validation e documentação interativa com Swagger/OpenAPI[cite: 3, 17].
+* **Zero Setup:** Permitir que qualquer membro da equipe ou avaliador execute o projeto de forma autônoma e imediata sem dependência de instalação e configuração de instâncias externas de banco de dados.
+* **Transparência para o Banco Relacional:** A aplicação já foi desacoplada utilizando abstrações do Spring Data JPA, garantindo que a migração futura para um banco SQL em produção (como PostgreSQL ou MySQL) ocorra apenas com ajustes de propriedades e drivers, preservando a lógica de negócio dos Controllers e Services.
+
 ## Stack
 
 | Item | Versão / Tecnologia |
