@@ -49,13 +49,13 @@ Nesta entrega, foram implementadas as funcionalidades do back-end para viabiliza
 
 ### Issue / Bug Tracker
 
-O acompanhamento das tarefas e do ciclo de vida das histórias de usuário desta entrega foi gerenciado diretamente pelo GitHub Issues[cite: 17].
+O acompanhamento das tarefas e do ciclo de vida das histórias de usuário desta entrega foi gerenciado diretamente pelo GitHub Issues.
 
 ![Issue Tracker](docs/Print_Issue.jpg)
 
 ### Screencasts da Aplicação
 
-Os vídeos de demonstração e de detalhamento técnico foram disponibilizados no YouTube conforme as diretrizes da entrega[cite: 17]:
+Os vídeos de demonstração e de detalhamento técnico foram disponibilizados no YouTube conforme as diretrizes da entrega:
 
 1. **Uso do Sistema (Aplicação Spring Boot rodando via Swagger UI):**  
    * Link: [Assistir no YouTube](https://youtu.be/xYEddJ1rLeY)
