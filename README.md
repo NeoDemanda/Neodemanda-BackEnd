@@ -68,7 +68,7 @@ Os vídeos de demonstração e de detalhamento técnico foram disponibilizados n
 ### Decisão Arquitetural: Persistência Temporária (H2 / Memória)
 
 Para a Entrega 02, optou-se pela utilização do banco H2 em memória e estruturas thread-safe[cite: 17]. Os principais fatores para essa decisão foram:
-* **Foco nos Contratos da API:** Priorizar a correta modelagem dos DTOs, validações com Bean Validation e documentação interativa com Swagger/OpenAPI[cite: 3, 17].
+* **Foco nos Contratos da API:** Priorizar a correta modelagem dos DTOs, validações com Bean Validation e documentação interativa com Swagger/OpenAPI.
 * **Zero Setup:** Permitir que qualquer membro da equipe ou avaliador execute o projeto de forma autônoma e imediata sem dependência de instalação e configuração de instâncias externas de banco de dados.
 * **Transparência para o Banco Relacional:** A aplicação já foi desacoplada utilizando abstrações do Spring Data JPA, garantindo que a migração futura para um banco SQL em produção (como PostgreSQL ou MySQL) ocorra apenas com ajustes de propriedades e drivers, preservando a lógica de negócio dos Controllers e Services.
 
