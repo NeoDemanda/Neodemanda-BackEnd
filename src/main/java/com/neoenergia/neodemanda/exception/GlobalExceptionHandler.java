@@ -1,8 +1,8 @@
 package com.neoenergia.neodemanda.exception;
 
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.validation.ConstraintViolation;
-import jakarta.validation.ConstraintViolationException;
+import java.util.LinkedHashMap;
+import java.util.Map;
+
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
@@ -10,24 +10,17 @@ import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.validation.ConstraintViolation;
+import jakarta.validation.ConstraintViolationException;
 import tools.jackson.core.JacksonException;
 import tools.jackson.core.JacksonException.Reference;
 import tools.jackson.databind.exc.InvalidFormatException;
 
-import java.util.LinkedHashMap;
-import java.util.Map;
-
-/**
- * Traduz excecoes da aplicacao para respostas JSON padronizadas ({@link ApiError}).
- *
- * <p>Excecoes nao mapeadas aqui continuam sendo tratadas pelo handler padrao do
- * Spring Boot, preservando os status originais do framework (por exemplo, 404
- * para rotas inexistentes).
- */
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
-	/** Falha de {@code @Valid} em corpo de requisicao. */
 	@ExceptionHandler(MethodArgumentNotValidException.class)
 	public ResponseEntity<ApiError> handleMethodArgumentNotValid(MethodArgumentNotValidException ex,
 			HttpServletRequest request) {
@@ -38,7 +31,6 @@ public class GlobalExceptionHandler {
 		return validationError(fields, request);
 	}
 
-	/** Falha de {@code @Validated} em parametros de metodo. */
 	@ExceptionHandler(ConstraintViolationException.class)
 	public ResponseEntity<ApiError> handleConstraintViolation(ConstraintViolationException ex,
 			HttpServletRequest request) {
@@ -49,11 +41,6 @@ public class GlobalExceptionHandler {
 		return validationError(fields, request);
 	}
 
-	/**
-	 * Corpo ilegivel pelo Jackson: JSON mal formatado, tipo incompativel ou valor
-	 * fora do dominio de um enum. Quando da para identificar o campo culpado, a
-	 * resposta sai no mesmo formato das falhas de {@code @Valid}.
-	 */
 	@ExceptionHandler(HttpMessageNotReadableException.class)
 	public ResponseEntity<ApiError> handleMessageNotReadable(HttpMessageNotReadableException ex,
 			HttpServletRequest request) {

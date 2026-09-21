@@ -1,15 +1,14 @@
 package com.neoenergia.neodemanda.controller;
 
-import com.neoenergia.neodemanda.dto.HealthResponse;
-import com.neoenergia.neodemanda.service.HealthService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-/**
- * Endpoint de verificacao de disponibilidade da API.
- */
+import com.neoenergia.neodemanda.dto.HealthResponse;
+import com.neoenergia.neodemanda.service.HealthService;
+
+
 @RestController
 @RequestMapping("/health")
 public class HealthController {

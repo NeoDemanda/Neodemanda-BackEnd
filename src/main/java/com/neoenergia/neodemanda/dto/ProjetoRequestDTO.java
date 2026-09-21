@@ -10,15 +10,7 @@ import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
 import jakarta.validation.constraints.Size;
 
-/**
- * Dados de entrada do cadastro de projeto, vindos do formulario de Novo Projeto.
- *
- * <p>Os limites de tamanho espelham as colunas de
- * {@link com.neoenergia.neodemanda.model.Projeto}. Ficam de fora os campos que
- * o cliente nao declara: {@code id} e as datas (gerados na persistencia),
- * {@code status} (atribuido pelo servidor) e {@code demandaCalculadaKva}, que e
- * resultado do calculo normativo e nao entrada do usuario.
- */
+
 public record ProjetoRequestDTO(
 
 		@NotBlank(message = "O nome do projeto e obrigatorio")

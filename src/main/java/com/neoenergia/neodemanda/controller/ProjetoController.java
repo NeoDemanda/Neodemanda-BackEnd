@@ -1,5 +1,8 @@
 package com.neoenergia.neodemanda.controller;
 
+import org.springframework.web.bind.annotation.GetMapping;
+import java.util.List;
+
 import java.net.URI;
 
 import org.springframework.http.ResponseEntity;
@@ -57,4 +60,10 @@ public class ProjetoController {
 		return ResponseEntity.created(localizacao).body(projetoCadastrado);
 	}
 
+	@GetMapping
+    @Operation(summary = "Listar projetos para o dashboard", description = "Retorna a lista de todos os projetos cadastrados e seus status.")
+    public ResponseEntity<List<ProjetoResponseDTO>> listarProjetos() {
+        List<ProjetoResponseDTO> projetos = projetoService.listarTodos();
+        return ResponseEntity.ok(projetos);
+    }
 }
