@@ -6,7 +6,11 @@ import java.util.List;
 import java.net.URI;
 
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -66,4 +70,52 @@ public class ProjetoController {
         List<ProjetoResponseDTO> projetos = projetoService.listarTodos();
         return ResponseEntity.ok(projetos);
     }
+
+	@PutMapping("/{id}")
+	@Operation(summary = "Edita um projeto existente",
+			description = "Atualiza os dados de um projeto em RASCUNHO. Id, data de criacao e status nao sao alterados.")
+	@ApiResponses({
+			@ApiResponse(responseCode = "200", description = "Projeto atualizado",
+					content = @Content(schema = @Schema(implementation = ProjetoResponseDTO.class))),
+			@ApiResponse(responseCode = "400", description = "Dados invalidos ou corpo mal formatado; o campo fields detalha cada violacao",
+					content = @Content(schema = @Schema(implementation = ApiError.class))),
+			@ApiResponse(responseCode = "404", description = "Projeto nao encontrado",
+					content = @Content(schema = @Schema(implementation = ApiError.class))),
+			@ApiResponse(responseCode = "409", description = "Projeto submetido nao pode ser editado",
+					content = @Content(schema = @Schema(implementation = ApiError.class)))
+	})
+	public ResponseEntity<ProjetoResponseDTO> atualizar(@PathVariable Long id,
+			@Valid @RequestBody ProjetoRequestDTO requisicao) {
+		return ResponseEntity.ok(projetoService.atualizar(id, requisicao));
+	}
+
+	@PatchMapping("/{id}/arquivar")
+	@Operation(summary = "Arquiva um projeto",
+			description = "Muda o status do projeto para ARQUIVADO, removendo-o da listagem do dashboard.")
+	@ApiResponses({
+			@ApiResponse(responseCode = "200", description = "Projeto arquivado",
+					content = @Content(schema = @Schema(implementation = ProjetoResponseDTO.class))),
+			@ApiResponse(responseCode = "404", description = "Projeto nao encontrado",
+					content = @Content(schema = @Schema(implementation = ApiError.class))),
+			@ApiResponse(responseCode = "409", description = "Projeto ja esta arquivado",
+					content = @Content(schema = @Schema(implementation = ApiError.class)))
+	})
+	public ResponseEntity<ProjetoResponseDTO> arquivar(@PathVariable Long id) {
+		return ResponseEntity.ok(projetoService.arquivar(id));
+	}
+
+	@DeleteMapping("/{id}")
+	@Operation(summary = "Exclui um projeto",
+			description = "Remove um projeto em RASCUNHO. Projetos submetidos ou arquivados nao podem ser excluidos.")
+	@ApiResponses({
+			@ApiResponse(responseCode = "204", description = "Projeto excluido"),
+			@ApiResponse(responseCode = "404", description = "Projeto nao encontrado",
+					content = @Content(schema = @Schema(implementation = ApiError.class))),
+			@ApiResponse(responseCode = "409", description = "Projeto submetido ou arquivado nao pode ser excluido",
+					content = @Content(schema = @Schema(implementation = ApiError.class)))
+	})
+	public ResponseEntity<Void> excluir(@PathVariable Long id) {
+		projetoService.excluir(id);
+		return ResponseEntity.noContent().build();
+	}
 }
