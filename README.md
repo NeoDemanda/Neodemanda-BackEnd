@@ -72,6 +72,66 @@ Para a Entrega 02, optou-se pela utilização do banco H2 em memória e estrutur
 * **Zero Setup:** Permitir que qualquer membro da equipe ou avaliador execute o projeto de forma autônoma e imediata sem dependência de instalação e configuração de instâncias externas de banco de dados.
 * **Transparência para o Banco Relacional:** A aplicação já foi desacoplada utilizando abstrações do Spring Data JPA, garantindo que a migração futura para um banco SQL em produção (como PostgreSQL ou MySQL) ocorra apenas com ajustes de propriedades e drivers, preservando a lógica de negócio dos Controllers e Services.
 
+
+## POO - Entrega 03
+
+### Histórias Implementadas
+
+Nesta entrega, foram implementadas as funcionalidades que completam o ciclo de vida da entidade Projeto, permitindo a edição de dados cadastrais, o arquivamento visual no painel e a remoção controlada de registos.
+
+#### [US06] Editar Projeto Existente
+- **Como** projetista
+- **Quero** editar as informações cadastrais de um projeto em rascunho
+- **Para que** eu possa corrigir dados e parâmetros da instalação antes do envio para análise.
+
+**Critérios de Aceite (BDD):**
+- **Dado** que o projetista deseja atualizar um projeto existente em status `RASCUNHO`
+- **Quando** envia uma requisição `PUT /projetos/{id}` com os dados cadastrais atualizados
+- **Então** o sistema atualiza as informações no banco de dados, mantendo `id` e `status` protegidos, e retorna o código HTTP `200 OK` com o DTO atualizado.
+
+---
+
+#### [US09] Arquivar e Excluir Projeto
+- **Como** projetista
+- **Quero** arquivar projetos concluídos ou excluir rascunhos descartados
+- **Para que** eu possa manter o dashboard organizado sem perder histórico normativo ou remover projetos não utilizados.
+
+**Critérios de Aceite (BDD):**
+- **Dado** que um projeto existe na aplicação
+- **Quando** o usuário envia uma requisição `PATCH /projetos/{id}/arquivar` (para arquivamento) ou `DELETE /projetos/{id}` (para exclusão de rascunho)
+- **Então** o sistema altera o status para `ARQUIVADO` (removendo-o da listagem ativa com `200 OK`) ou remove o registro em definitivo da base de dados (retornando `204 No Content`)
+
+---
+
+### Issue / Bug Tracker
+
+O acompanhamento e o detalhamento das atividades de desenvolvimento das histórias US06 e US09 foram gerenciados de forma contínua pelo GitHub Issues.
+
+![Issue Tracker Entrega 03](docs/Print_Issue_Entrega03.jpg)
+
+### Screencasts da Aplicação
+
+Os vídeos de demonstração e de explicação do código foram disponibilizados no YouTube conforme os critérios avaliativos da disciplina:
+
+1. **Uso do Sistema (Demonstração prática dos fluxos no Swagger UI) + Explicação do Código Spring Boot (Arquitetura, Controller, Service e Regras de Negócio):**  
+   * Link: [Assistir no YouTube](https://youtu.be/8YeLCpylZbw)
+
+---
+
+### Endpoints Atualizados
+
+| Método | Rota | Descrição | Resposta de Sucesso | Possíveis Erros |
+| --- | --- | --- | --- | --- |
+| `GET` | `/health` | Health-check da API | `200 OK` | — |
+| `GET` | `/projetos` | Listagem de projetos ativos do dashboard (US01) | `200 OK` | — |
+| `POST` | `/projetos` | Cadastro de novo projeto com status inicial RASCUNHO (US02) | `201 Created` | `400 Bad Request` |
+| `PUT` | `/projetos/{id}` | Edição de campos cadastrais de projetos em rascunho (US06) | `200 OK` | `400`, `404`, `409 Conflict` |
+| `PATCH` | `/projetos/{id}/arquivar` | Arquivamento de projeto e remoção da listagem ativa (US09) | `200 OK` | `404 Not Found`, `409 Conflict` |
+| `DELETE` | `/projetos/{id}` | Exclusão física de projeto em rascunho (US09) | `204 No Content` | `404 Not Found`, `409 Conflict` |
+
+---
+
+
 ## Stack
 
 | Item | Versão / Tecnologia |
