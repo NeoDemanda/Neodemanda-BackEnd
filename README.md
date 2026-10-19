@@ -113,7 +113,7 @@ O acompanhamento e o detalhamento das atividades de desenvolvimento das históri
 
 Os vídeos de demonstração e de explicação do código foram disponibilizados no YouTube conforme os critérios avaliativos da disciplina:
 
-1. **Uso do Sistema (Demonstração prática dos fluxos no Swagger UI) + Explicação do Código Spring Boot (Arquitetura, Controller, Service e Regras de Negócio):**  
+**Uso do Sistema (Demonstração prática dos fluxos no Swagger UI) + Explicação do Código Spring Boot (Arquitetura, Controller, Service e Regras de Negócio):**  
    * Link: [Assistir no YouTube](https://youtu.be/8YeLCpylZbw)
 
 ---
