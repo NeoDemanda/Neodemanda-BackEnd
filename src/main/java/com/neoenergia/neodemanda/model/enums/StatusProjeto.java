@@ -6,6 +6,7 @@ public enum StatusProjeto {
 	RASCUNHO,
 	EM_ANALISE,
 	APROVADO,
-	REPROVADO
+	REPROVADO,
+	ARQUIVADO
 
 }

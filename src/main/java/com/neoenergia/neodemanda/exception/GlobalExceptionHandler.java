@@ -69,6 +69,13 @@ public class GlobalExceptionHandler {
 						request.getRequestURI()));
 	}
 
+	@ExceptionHandler(ConflictException.class)
+	public ResponseEntity<ApiError> handleConflict(ConflictException ex, HttpServletRequest request) {
+		return ResponseEntity.status(HttpStatus.CONFLICT)
+				.body(ApiError.of(HttpStatus.CONFLICT.value(), HttpStatus.CONFLICT.getReasonPhrase(), ex.getMessage(),
+						request.getRequestURI()));
+	}
+
 	private static String nomeDoCampo(JacksonException ex) {
 		String campo = null;
 		for (Reference referencia : ex.getPath()) {
