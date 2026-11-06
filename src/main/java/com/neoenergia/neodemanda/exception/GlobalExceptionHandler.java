@@ -11,6 +11,9 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
+import com.neoenergia.neodemanda.motor.excecao.CoberturaNormativaException;
+import com.neoenergia.neodemanda.motor.excecao.EntradaInvalidaException;
+
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.ConstraintViolation;
 import jakarta.validation.ConstraintViolationException;
@@ -81,6 +84,21 @@ public class GlobalExceptionHandler {
 			HttpServletRequest request) {
 		return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
 				.body(ApiError.of(HttpStatus.UNAUTHORIZED.value(), HttpStatus.UNAUTHORIZED.getReasonPhrase(),
+						ex.getMessage(), request.getRequestURI()));
+	}
+
+	@ExceptionHandler(EntradaInvalidaException.class)
+	public ResponseEntity<ApiError> handleEntradaInvalida(EntradaInvalidaException ex, HttpServletRequest request) {
+		return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+				.body(ApiError.of(HttpStatus.BAD_REQUEST.value(), HttpStatus.BAD_REQUEST.getReasonPhrase(), ex.getMessage(),
+						request.getRequestURI()));
+	}
+
+	@ExceptionHandler(CoberturaNormativaException.class)
+	public ResponseEntity<ApiError> handleCoberturaNormativa(CoberturaNormativaException ex,
+			HttpServletRequest request) {
+		return ResponseEntity.status(HttpStatus.UNPROCESSABLE_CONTENT)
+				.body(ApiError.of(HttpStatus.UNPROCESSABLE_CONTENT.value(), HttpStatus.UNPROCESSABLE_CONTENT.getReasonPhrase(),
 						ex.getMessage(), request.getRequestURI()));
 	}
 
