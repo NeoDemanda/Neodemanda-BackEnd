@@ -18,7 +18,9 @@ import com.neoenergia.neodemanda.motor.entrada.DadosEntradaCalculo;
 import com.neoenergia.neodemanda.motor.excecao.EntradaInvalidaException;
 import com.neoenergia.neodemanda.motor.regra.RegraCalculo;
 import com.neoenergia.neodemanda.motor.saida.PassoCalculo;
+import com.neoenergia.neodemanda.motor.saida.ReferenciaNormativa;
 import com.neoenergia.neodemanda.motor.saida.ResultadoCalculo;
+import com.neoenergia.neodemanda.motor.saida.UnidadeMedida;
 
 class MotorCalculoTest {
 
@@ -126,7 +128,18 @@ class MotorCalculoTest {
 			BigDecimal valor = contexto.entrada().cargaInstaladaKva()
 					.setScale(MotorConstantes.ESCALA, MotorConstantes.ARREDONDAMENTO);
 			contexto.registrar(ChaveResultado.DEMANDA_TOTAL, valor);
-			contexto.memoria().adicionar(new PassoCalculo(id(), nome, referenciaNormativa(), valor));
+			contexto.memoria().adicionar(PassoCalculo.builder()
+					.ordem(contexto.memoria().proximaOrdem())
+					.idRegra(id())
+					.descricao(nome)
+					.simbolo("TESTE")
+					.formulaSimbolica("TESTE")
+					.formulaAplicada("TESTE")
+					.entrada("carga instalada", contexto.entrada().cargaInstaladaKva(), UnidadeMedida.KVA)
+					.valorProduzido(valor)
+					.unidade(UnidadeMedida.KVA)
+					.referenciaNormativa(new ReferenciaNormativa("TESTE", "TESTE", "TESTE"))
+					.build());
 		}
 
 	}
