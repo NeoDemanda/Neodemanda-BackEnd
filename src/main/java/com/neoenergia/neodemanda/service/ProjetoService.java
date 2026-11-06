@@ -3,6 +3,8 @@ package com.neoenergia.neodemanda.service;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicLong;
 
 import org.springframework.stereotype.Service;
@@ -19,6 +21,7 @@ public class ProjetoService {
 
     private final AtomicLong sequenciaId = new AtomicLong();
     private final List<Projeto> projetosEmMemoria = Collections.synchronizedList(new ArrayList<>());
+    private final Map<Long, Long> revisoes = new ConcurrentHashMap<>();
 
    
     public ProjetoResponseDTO cadastrar(ProjetoRequestDTO requisicao) {
@@ -56,6 +59,7 @@ public class ProjetoService {
         projeto.setQuantidadeUnidadesConsumidoras(requisicao.quantidadeUnidadesConsumidoras());
         projeto.setCargaInstaladaKva(requisicao.cargaInstaladaKva());
         projeto.setTipoEdificacao(requisicao.tipoEdificacao());
+        revisoes.merge(id, 1L, Long::sum);
 
         return toResponseDTO(projeto);
     }
@@ -78,6 +82,28 @@ public class ProjetoService {
         validarAlteracaoPermitida(projeto, "excluido");
 
         projetosEmMemoria.remove(projeto);
+    }
+
+
+    public ProjetoParaCalculo consultarParaCalculo(Long id) {
+        return paraCalculo(buscarPorId(id));
+    }
+
+
+    public ProjetoParaCalculo consultarParaNovoCalculo(Long id) {
+        Projeto projeto = buscarPorId(id);
+        validarAlteracaoPermitida(projeto, "calculado");
+
+        return paraCalculo(projeto);
+    }
+
+
+    private ProjetoParaCalculo paraCalculo(Projeto projeto) {
+        return new ProjetoParaCalculo(
+                projeto.getTipoEdificacao(),
+                projeto.getQuantidadeUnidadesConsumidoras(),
+                projeto.getCargaInstaladaKva(),
+                revisoes.getOrDefault(projeto.getId(), 0L));
     }
 
 
@@ -119,4 +145,4 @@ public class ProjetoService {
         return projeto;
     }
 
-}
+}
