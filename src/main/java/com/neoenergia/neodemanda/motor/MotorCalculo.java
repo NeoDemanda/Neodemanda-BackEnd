@@ -2,7 +2,6 @@ package com.neoenergia.neodemanda.motor;
 
 import java.util.List;
 
-import com.neoenergia.neodemanda.motor.contexto.ChaveResultado;
 import com.neoenergia.neodemanda.motor.contexto.ContextoCalculo;
 import com.neoenergia.neodemanda.motor.entrada.DadosEntradaCalculo;
 import com.neoenergia.neodemanda.motor.excecao.EntradaInvalidaException;
@@ -27,7 +26,7 @@ public class MotorCalculo {
 				regra.aplicar(contexto);
 			}
 		}
-		return new ResultadoCalculo(contexto.obter(ChaveResultado.DEMANDA_TOTAL), contexto.memoria());
+		return ResultadoCalculo.de(contexto);
 	}
 
 }
