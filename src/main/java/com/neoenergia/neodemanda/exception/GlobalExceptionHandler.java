@@ -76,6 +76,14 @@ public class GlobalExceptionHandler {
 						request.getRequestURI()));
 	}
 
+	@ExceptionHandler(CredenciaisInvalidasException.class)
+	public ResponseEntity<ApiError> handleCredenciaisInvalidas(CredenciaisInvalidasException ex,
+			HttpServletRequest request) {
+		return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+				.body(ApiError.of(HttpStatus.UNAUTHORIZED.value(), HttpStatus.UNAUTHORIZED.getReasonPhrase(),
+						ex.getMessage(), request.getRequestURI()));
+	}
+
 	private static String nomeDoCampo(JacksonException ex) {
 		String campo = null;
 		for (Reference referencia : ex.getPath()) {
