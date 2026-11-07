@@ -36,7 +36,7 @@ public class CalculoController {
 
 	@PostMapping
 	@Operation(summary = "Calcula a demanda de um projeto",
-			description = "Calcula a demanda de um projeto em RASCUNHO, guarda o resultado e as entradas usadas e "
+			description = "Calcula a demanda de um projeto em RASCUNHO ou EM_CORRECAO, guarda o resultado e as entradas usadas e "
 					+ "devolve o resultado com o memorial. Tipo de edificacao, unidades consumidoras e carga instalada "
 					+ "vem do projeto; se enviados no corpo, sao ignorados. Recalcular substitui o calculo anterior; "
 					+ "um calculo que falha mantem o anterior. O bloco entradas e as entradas do memorial em m2, W, kW e cv "
@@ -67,7 +67,7 @@ public class CalculoController {
 					content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE,
 							schema = @Schema(implementation = ApiError.class),
 							examples = @ExampleObject(name = "Projeto inexistente", value = CalculoExemplos.ERRO_404_PROJETO))),
-			@ApiResponse(responseCode = "409", description = "O status do projeto nao permite calcular: so RASCUNHO e aceito",
+			@ApiResponse(responseCode = "409", description = "O status do projeto nao permite calcular: so RASCUNHO e EM_CORRECAO sao aceitos",
 					content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE,
 							schema = @Schema(implementation = ApiError.class),
 							examples = {

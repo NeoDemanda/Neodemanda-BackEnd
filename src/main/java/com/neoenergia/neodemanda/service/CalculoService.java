@@ -3,6 +3,7 @@ package com.neoenergia.neodemanda.service;
 import java.math.BigDecimal;
 import java.time.OffsetDateTime;
 import java.util.List;
+import java.util.Optional;
 import java.util.function.Consumer;
 
 import org.springframework.stereotype.Service;
@@ -34,6 +35,10 @@ public class CalculoService {
 	}
 
 	public CalculoResponse calcular(Long projetoId, CalculoRequest requisicao) {
+		return projetoService.executarComLock(() -> calcularComLock(projetoId, requisicao));
+	}
+
+	private CalculoResponse calcularComLock(Long projetoId, CalculoRequest requisicao) {
 		ProjetoParaCalculo projeto = projetoService.consultarParaNovoCalculo(projetoId);
 		validarCargaInstalada(projeto.cargaInstaladaKva());
 
@@ -48,12 +53,20 @@ public class CalculoService {
 	}
 
 	public CalculoResponse consultar(Long projetoId) {
+		return calculoValido(projetoId)
+				.map(CalculoResponse::de)
+				.orElseThrow(() -> new ResourceNotFoundException("Nenhum calculo valido para o projeto: " + projetoId));
+	}
+
+	public boolean temCalculoValido(Long projetoId) {
+		return calculoValido(projetoId).isPresent();
+	}
+
+	private Optional<CalculoGuardado> calculoValido(Long projetoId) {
 		ProjetoParaCalculo projeto = projetoService.consultarParaCalculo(projetoId);
 
 		return calculoRepository.buscarPorProjeto(projetoId)
-				.filter(calculo -> calculo.revisaoProjeto() == projeto.revisao())
-				.map(CalculoResponse::de)
-				.orElseThrow(() -> new ResourceNotFoundException("Nenhum calculo valido para o projeto: " + projetoId));
+				.filter(calculo -> calculo.revisaoProjeto() == projeto.revisao());
 	}
 
 	private static void validarCargaInstalada(BigDecimal cargaInstaladaKva) {
