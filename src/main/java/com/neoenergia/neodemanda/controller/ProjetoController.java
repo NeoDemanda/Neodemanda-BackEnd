@@ -5,6 +5,7 @@ import java.util.List;
 
 import java.net.URI;
 
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
@@ -13,16 +14,21 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import com.neoenergia.neodemanda.dto.ProjetoRequestDTO;
 import com.neoenergia.neodemanda.dto.ProjetoResponseDTO;
 import com.neoenergia.neodemanda.exception.ApiError;
+import com.neoenergia.neodemanda.model.enums.StatusProjeto;
 import com.neoenergia.neodemanda.service.ProjetoService;
 
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.ArraySchema;
 import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.ExampleObject;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
@@ -65,15 +71,45 @@ public class ProjetoController {
 	}
 
 	@GetMapping
-    @Operation(summary = "Listar projetos para o dashboard", description = "Retorna a lista de todos os projetos cadastrados e seus status.")
-    public ResponseEntity<List<ProjetoResponseDTO>> listarProjetos() {
-        List<ProjetoResponseDTO> projetos = projetoService.listarTodos();
+    @Operation(summary = "Listar projetos para o dashboard",
+            description = "Retorna os projetos cadastrados e seus status. Sem filtro, os projetos arquivados ficam de fora; "
+                    + "com o filtro, retorna so os projetos no status informado, inclusive ARQUIVADO.")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "Lista de projetos",
+                    content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE,
+                            array = @ArraySchema(schema = @Schema(implementation = ProjetoResponseDTO.class)),
+                            examples = @ExampleObject(name = "Projetos em analise", value = AvaliacaoExemplos.RESPOSTA_LISTA))),
+            @ApiResponse(responseCode = "400", description = "Status invalido",
+                    content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE,
+                            schema = @Schema(implementation = ApiError.class),
+                            examples = @ExampleObject(name = "Status invalido", value = AvaliacaoExemplos.ERRO_400_STATUS)))
+    })
+    public ResponseEntity<List<ProjetoResponseDTO>> listarProjetos(
+            @Parameter(description = "Filtro opcional por status") @RequestParam(required = false) StatusProjeto status) {
+        List<ProjetoResponseDTO> projetos = projetoService.listar(status);
         return ResponseEntity.ok(projetos);
     }
 
+	@GetMapping("/{id}")
+	@Operation(summary = "Consulta o detalhe de um projeto",
+			description = "Devolve os dados do projeto com o status atual, em qualquer status.")
+	@ApiResponses({
+			@ApiResponse(responseCode = "200", description = "Projeto encontrado",
+					content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE,
+							schema = @Schema(implementation = ProjetoResponseDTO.class),
+							examples = @ExampleObject(name = "Projeto em rascunho", value = AvaliacaoExemplos.RESPOSTA_PROJETO))),
+			@ApiResponse(responseCode = "404", description = "Projeto nao encontrado",
+					content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE,
+							schema = @Schema(implementation = ApiError.class),
+							examples = @ExampleObject(name = "Projeto inexistente", value = AvaliacaoExemplos.ERRO_404_PROJETO)))
+	})
+	public ResponseEntity<ProjetoResponseDTO> consultar(@PathVariable Long id) {
+		return ResponseEntity.ok(projetoService.consultar(id));
+	}
+
 	@PutMapping("/{id}")
 	@Operation(summary = "Edita um projeto existente",
-			description = "Atualiza os dados de um projeto em RASCUNHO. Id, data de criacao e status nao sao alterados.")
+			description = "Atualiza os dados de um projeto em RASCUNHO ou EM_CORRECAO. Id, data de criacao e status nao sao alterados.")
 	@ApiResponses({
 			@ApiResponse(responseCode = "200", description = "Projeto atualizado",
 					content = @Content(schema = @Schema(implementation = ProjetoResponseDTO.class))),

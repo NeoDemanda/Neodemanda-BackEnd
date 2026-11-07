@@ -10,6 +10,7 @@ import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 
 import com.neoenergia.neodemanda.motor.excecao.CoberturaNormativaException;
 import com.neoenergia.neodemanda.motor.excecao.EntradaInvalidaException;
@@ -62,6 +63,14 @@ public class GlobalExceptionHandler {
 					.body(ApiError.of(HttpStatus.BAD_REQUEST.value(), HttpStatus.BAD_REQUEST.getReasonPhrase(),
 							"Corpo da requisicao invalido ou mal formatado", request.getRequestURI()));
 		}
+		return validationError(fields, request);
+	}
+
+	@ExceptionHandler(MethodArgumentTypeMismatchException.class)
+	public ResponseEntity<ApiError> handleMethodArgumentTypeMismatch(MethodArgumentTypeMismatchException ex,
+			HttpServletRequest request) {
+		Map<String, String> fields = new LinkedHashMap<>();
+		fields.put(ex.getName(), "Valor invalido: " + ex.getValue());
 		return validationError(fields, request);
 	}
 

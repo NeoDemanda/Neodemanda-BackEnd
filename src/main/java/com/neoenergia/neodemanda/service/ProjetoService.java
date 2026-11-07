@@ -4,8 +4,10 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicLong;
+import java.util.function.Supplier;
 
 import org.springframework.stereotype.Service;
 
@@ -19,12 +21,15 @@ import com.neoenergia.neodemanda.model.enums.StatusProjeto;
 @Service
 public class ProjetoService {
 
+    private static final Set<StatusProjeto> STATUS_EDITAVEIS = Set.of(StatusProjeto.RASCUNHO, StatusProjeto.EM_CORRECAO);
+    private static final Set<StatusProjeto> STATUS_EXCLUIVEIS = Set.of(StatusProjeto.RASCUNHO);
+
     private final AtomicLong sequenciaId = new AtomicLong();
     private final List<Projeto> projetosEmMemoria = Collections.synchronizedList(new ArrayList<>());
     private final Map<Long, Long> revisoes = new ConcurrentHashMap<>();
 
    
-    public ProjetoResponseDTO cadastrar(ProjetoRequestDTO requisicao) {
+    public synchronized ProjetoResponseDTO cadastrar(ProjetoRequestDTO requisicao) {
         Projeto projeto = new Projeto(
                 requisicao.nomeProjeto(),
                 requisicao.responsavelTecnico(),
@@ -41,7 +46,7 @@ public class ProjetoService {
     }
 
     
-    public List<ProjetoResponseDTO> listarTodos() {
+    public synchronized List<ProjetoResponseDTO> listarTodos() {
         return projetosEmMemoria.stream()
                 .filter(projeto -> projeto.getStatus() != StatusProjeto.ARQUIVADO)
                 .map(this::toResponseDTO)
@@ -49,9 +54,25 @@ public class ProjetoService {
     }
 
 
-    public ProjetoResponseDTO atualizar(Long id, ProjetoRequestDTO requisicao) {
+    public synchronized List<ProjetoResponseDTO> listar(StatusProjeto status) {
+        if (status == null) {
+            return listarTodos();
+        }
+        return projetosEmMemoria.stream()
+                .filter(projeto -> projeto.getStatus() == status)
+                .map(this::toResponseDTO)
+                .toList();
+    }
+
+
+    public synchronized ProjetoResponseDTO consultar(Long id) {
+        return toResponseDTO(buscarPorId(id));
+    }
+
+
+    public synchronized ProjetoResponseDTO atualizar(Long id, ProjetoRequestDTO requisicao) {
         Projeto projeto = buscarPorId(id);
-        validarAlteracaoPermitida(projeto, "editado");
+        validarAlteracaoPermitida(projeto, "editado", STATUS_EDITAVEIS);
 
         projeto.setNomeProjeto(requisicao.nomeProjeto());
         projeto.setResponsavelTecnico(requisicao.responsavelTecnico());
@@ -65,7 +86,7 @@ public class ProjetoService {
     }
 
 
-    public ProjetoResponseDTO arquivar(Long id) {
+    public synchronized ProjetoResponseDTO arquivar(Long id) {
         Projeto projeto = buscarPorId(id);
         if (projeto.getStatus() == StatusProjeto.ARQUIVADO) {
             throw new ConflictException("Projeto ja esta arquivado");
@@ -77,22 +98,44 @@ public class ProjetoService {
     }
 
 
-    public void excluir(Long id) {
+    public synchronized void validarTransicao(Long id, StatusProjeto destino) {
+        StatusProjeto atual = buscarPorId(id).getStatus();
+        if (!atual.podeTransicionarPara(destino)) {
+            throw new ConflictException("Transicao invalida: projeto em " + atual + " nao pode passar para " + destino);
+        }
+    }
+
+
+    public synchronized ProjetoResponseDTO transicionar(Long id, StatusProjeto destino) {
+        validarTransicao(id, destino);
         Projeto projeto = buscarPorId(id);
-        validarAlteracaoPermitida(projeto, "excluido");
+        projeto.setStatus(destino);
+
+        return toResponseDTO(projeto);
+    }
+
+
+    public synchronized <T> T executarComLock(Supplier<T> acao) {
+        return acao.get();
+    }
+
+
+    public synchronized void excluir(Long id) {
+        Projeto projeto = buscarPorId(id);
+        validarAlteracaoPermitida(projeto, "excluido", STATUS_EXCLUIVEIS);
 
         projetosEmMemoria.remove(projeto);
     }
 
 
-    public ProjetoParaCalculo consultarParaCalculo(Long id) {
+    public synchronized ProjetoParaCalculo consultarParaCalculo(Long id) {
         return paraCalculo(buscarPorId(id));
     }
 
 
-    public ProjetoParaCalculo consultarParaNovoCalculo(Long id) {
+    public synchronized ProjetoParaCalculo consultarParaNovoCalculo(Long id) {
         Projeto projeto = buscarPorId(id);
-        validarAlteracaoPermitida(projeto, "calculado");
+        validarAlteracaoPermitida(projeto, "calculado", STATUS_EDITAVEIS);
 
         return paraCalculo(projeto);
     }
@@ -107,7 +150,7 @@ public class ProjetoService {
     }
 
 
-    private Projeto buscarPorId(Long id) {
+    private synchronized Projeto buscarPorId(Long id) {
         return projetosEmMemoria.stream()
                 .filter(projeto -> projeto.getId().equals(id))
                 .findFirst()
@@ -115,11 +158,11 @@ public class ProjetoService {
     }
 
 
-    private void validarAlteracaoPermitida(Projeto projeto, String acao) {
+    private void validarAlteracaoPermitida(Projeto projeto, String acao, Set<StatusProjeto> statusPermitidos) {
         if (projeto.getStatus() == StatusProjeto.ARQUIVADO) {
             throw new ConflictException("Projeto arquivado nao pode ser " + acao);
         }
-        if (projeto.getStatus() != StatusProjeto.RASCUNHO) {
+        if (!statusPermitidos.contains(projeto.getStatus())) {
             throw new ConflictException("Projeto submetido nao pode ser " + acao
                     + ". Status atual: " + projeto.getStatus());
         }
