@@ -116,6 +116,49 @@ Os vídeos de demonstração e de explicação do código foram disponibilizados
 **Uso do Sistema (Demonstração prática dos fluxos no Swagger UI) + Explicação do Código Spring Boot (Arquitetura, Controller, Service e Regras de Negócio):**  
    * Link: [Assistir no YouTube](https://youtu.be/8YeLCpylZbw)
 
+## POO - Entrega 04
+
+### Histórias Implementadas
+
+Nesta entrega, foram implementadas as funcionalidades que compõem o fluxo de análise e validação técnica dos projetos, viabilizando a submissão formal de projetos para homologação e o registro estruturado de pareceres de avaliação com histórico auditável.
+
+#### [US08] Submeter Projeto
+- **Como** projetista
+- **Quero** submeter meu projeto elétrico para avaliação técnica
+- **Para que** a equipe técnica da concessionária analise a conformidade dos parâmetros e aprove a ligação da demanda.
+
+**Critérios de Aceite (BDD):**
+- **Dado** que o projetista possui um projeto cadastrado com dados e cálculos finalizados
+- **Quando** envia uma requisição `POST /projetos/{id}/submissao`
+- **Então** o sistema valida a completude das informações, altera o status do projeto para `SUBMETIDO` (bloqueando edições cadastrais diretas) e retorna o código HTTP `200 OK` com os detalhes atualizados.
+
+---
+
+#### [US04] Validar Projeto
+- **Como** analista técnico da Neoenergia
+- **Quero** registrar pareceres de avaliação técnica e consultar o histórico de análises de um projeto
+- **Para que** as decisões de aprovação ou indeferimento fiquem registradas de maneira auditável e acessíveis a qualquer momento.
+
+**Critérios de Aceite (BDD):**
+- **Dado** que um projeto está em análise técnica com status `SUBMETIDO`
+- **Quando** o analista envia uma requisição `POST /projetos/{id}/avaliacao` informando o parecer e o resultado (deferido/indeferido) ou realiza um `GET /projetos/{id}/avaliacoes`
+- **Então** o sistema persiste o novo parecer no histórico, atualiza o status do projeto para `APROVADO` ou `PENDENTE` (retornando `200 OK` ou `201 Created`), e viabiliza a recuperação cronológica de todas as avaliações já registradas.
+
+---
+
+### Issue / Bug Tracker
+
+O acompanhamento e o detalhamento das atividades de desenvolvimento das histórias US08 e US04 foram gerenciados de forma contínua pelo GitHub Issues.
+
+![Issue Tracker Entrega 04](docs/Print_Issue_Entrega04.jpg)
+
+### Screencasts da Aplicação
+
+Os vídeos de demonstração e de explicação do código foram disponibilizados no YouTube conforme os critérios avaliativos da disciplina:
+
+**Uso do Sistema (Demonstração prática dos fluxos no Swagger UI) + Explicação do Código Spring Boot (Arquitetura, Controller, Service e Regras de Negócio):**  
+   * Link: [Assistir no YouTube](https://youtu.be/lPfZxVmXd9E)
+
 ---
 
 ### Endpoints Atualizados
